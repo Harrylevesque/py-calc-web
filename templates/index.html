@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Math Code Editor</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <div class="title">
+        <h1>Math Code Editor</h1>
+        <p>Line-by-line evaluation with cascading updates.</p>
+      </div>
+    </header>
+
+    <div class="main-container" id="mainContainer">
+      <main class="editor-area" style="order: 2;">
+        <div class="editor-menu">
+          <div class="editor-menu-left">
+            <button class="menu-btn" id="runBtn">▶ Run</button>
+            <button class="menu-btn" id="clearBtn">Clear</button>
+            <button class="menu-btn" id="toggleSearch">Search</button>
+            <button class="menu-btn" id="toggleVars">Variables</button>
+          </div>
+          <div class="editor-menu-right">
+            <div class="tabs" id="tabs"></div>
+            <button class="tab-add-btn" id="addTabBtn">New Page</button>
+            <span class="editor-info" id="editorInfo">Ready</span>
+          </div>
+        </div>
+        <div class="editor-shell">
+          <pre id="overlay" aria-hidden="true"></pre>
+          <textarea id="editor" spellcheck="false" placeholder="# Type Python expressions or assignments
+x = 10
+y = x * 2
+# Reference other pages: page_name.variable_name
+# Example: Page1.x"></textarea>
+        </div>
+      </main>
+
+      <div class="pane-wrapper" id="searchWrapper" data-dock="right" data-pane="search">
+        <div class="splitter vertical" id="searchSplitter" aria-hidden="true"></div>
+        <aside class="side-pane open" id="searchPane">
+          <div class="panel-header drag-handle">
+            <h3>Search</h3>
+            <div class="panel-actions">
+              <button class="panel-btn" id="searchDockBtn">Dock Left</button>
+              <button id="closeSearch" class="close-btn" aria-label="Close search">✕</button>
+            </div>
+          </div>
+          <div class="panel-content">
+            <label for="functionSearch">Search functions or plain text</label>
+            <input id="functionSearch" type="text" placeholder="Search functions or keywords" />
+            <div id="searchResults" class="search-results"></div>
+          </div>
+        </aside>
+      </div>
+
+      <div class="pane-wrapper" id="variablesWrapper" data-dock="right" data-pane="variables">
+        <div class="splitter vertical" id="variablesSplitter" aria-hidden="true"></div>
+        <aside class="side-pane open" id="variablesPane">
+          <div class="panel-header drag-handle">
+            <h3>Variables</h3>
+            <div class="panel-actions">
+              <button class="panel-btn" id="variablesDockBtn">Dock Left</button>
+              <button id="closeVariables" class="close-btn" aria-label="Close variables">✕</button>
+            </div>
+          </div>
+          <div class="panel-content" id="variablesContent"></div>
+        </aside>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <div class="status" id="status"></div>
+      <div class="legend">
+        <span>Available libs: math, cmath, statistics, random, decimal, fractions, numpy, scipy, sympy, mpmath</span>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Error Logs Modal -->
+  <div class="modal" id="errorModal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Error Logs</h2>
+        <button class="modal-close" id="closeErrorModal">✕</button>
+      </div>
+      <div class="modal-body">
+        <div id="errorLogsList" class="error-logs-list">
+          <p style="color: #aaa;">No errors logged yet.</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn" id="clearErrorsBtn">Clear Logs</button>
+        <button class="modal-btn" id="closeErrorsBtn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/@interactjs/interactjs/index.js"></script>
+  <script src="/static/app.js"></script>
+</body>
+</html>
