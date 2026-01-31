@@ -3,25 +3,18 @@ const overlay = document.getElementById("overlay");
 const status = document.getElementById("status");
 const functionSearch = document.getElementById("functionSearch");
 const searchResults = document.getElementById("searchResults");
-const searchWrapper = document.getElementById("searchWrapper");
-const variablesWrapper = document.getElementById("variablesWrapper");
-const searchPane = document.getElementById("searchPane");
-const variablesPane = document.getElementById("variablesPane");
 const toggleSearchBtn = document.getElementById("toggleSearch");
 const toggleVarsBtn = document.getElementById("toggleVars");
-const closeSearchBtn = document.getElementById("closeSearch");
-const closeVariablesBtn = document.getElementById("closeVariables");
+const togglePagesBtn = document.getElementById("togglePages");
 const runBtn = document.getElementById("runBtn");
 const clearBtn = document.getElementById("clearBtn");
 const editorInfo = document.getElementById("editorInfo");
-const tabsContainer = document.getElementById("tabs");
-const addTabBtn = document.getElementById("addTabBtn");
+const addPageBtn = document.getElementById("addPageBtn");
+const pagesContent = document.getElementById("pagesContent");
 const variablesContent = document.getElementById("variablesContent");
-const mainContainer = document.getElementById("mainContainer");
-const searchSplitter = document.getElementById("searchSplitter");
-const variablesSplitter = document.getElementById("variablesSplitter");
-const searchDockBtn = document.getElementById("searchDockBtn");
-const variablesDockBtn = document.getElementById("variablesDockBtn");
+const searchDropdownContent = document.getElementById("searchDropdownContent");
+const variablesDropdownContent = document.getElementById("variablesDropdownContent");
+const pagesDropdownContent = document.getElementById("pagesDropdownContent");
 
 // Error Modal elements
 const errorModal = document.getElementById("errorModal");
@@ -274,111 +267,39 @@ functionSearch.addEventListener("input", (event) => {
 
 editor.addEventListener("input", scheduleEvaluation);
 
-const openPane = (wrapper, pane) => {
-  wrapper.classList.remove("hidden");
-  pane.classList.add("open");
-  if (!pane.style.width || pane.style.width === "0px") {
-    pane.style.width = "320px";
+// Dropdown toggle functions
+const toggleDropdown = (dropdownContent) => {
+  const isOpen = dropdownContent.classList.contains("open");
+  closeAllDropdowns();
+  if (!isOpen) {
+    dropdownContent.classList.add("open");
   }
 };
 
-const closePane = (wrapper, pane) => {
-  pane.classList.remove("open");
-  pane.style.width = "0px";
-  wrapper.classList.add("hidden");
-  wrapper.classList.remove("floating");
-};
-
-const enableDragging = (wrapper) => {
-  if (!window.interact) {
-    return;
-  }
-  interact(wrapper).draggable({
-    allowFrom: ".drag-handle",
-    listeners: {
-      start(event) {
-        wrapper.classList.add("floating");
-        wrapper.dataset.x = wrapper.dataset.x || "0";
-        wrapper.dataset.y = wrapper.dataset.y || "0";
-      },
-      move(event) {
-        const x = (parseFloat(wrapper.dataset.x) || 0) + event.dx;
-        const y = (parseFloat(wrapper.dataset.y) || 0) + event.dy;
-        wrapper.style.transform = `translate(${x}px, ${y}px)`;
-        wrapper.dataset.x = x;
-        wrapper.dataset.y = y;
-      }
-    }
+const closeAllDropdowns = () => {
+  document.querySelectorAll(".dropdown-content").forEach(dd => {
+    dd.classList.remove("open");
   });
 };
 
-const toggleDock = (wrapper, button) => {
-  const current = wrapper.dataset.dock || "right";
-  const next = current === "right" ? "left" : "right";
-  wrapper.dataset.dock = next;
-  button.textContent = next === "right" ? "Dock Left" : "Dock Right";
-};
+// Close dropdowns when clicking outside
+document.addEventListener("click", (e) => {
+  if (!e.target.closest(".dropdown")) {
+    closeAllDropdowns();
+  }
+});
 
 toggleSearchBtn.addEventListener("click", () => {
-  openPane(searchWrapper, searchPane);
+  toggleDropdown(searchDropdownContent);
   functionSearch.focus();
 });
 
 toggleVarsBtn.addEventListener("click", () => {
-  openPane(variablesWrapper, variablesPane);
+  toggleDropdown(variablesDropdownContent);
 });
 
-closeSearchBtn.addEventListener("click", () => {
-  closePane(searchWrapper, searchPane);
-});
-
-closeVariablesBtn.addEventListener("click", () => {
-  closePane(variablesWrapper, variablesPane);
-});
-
-searchDockBtn.addEventListener("click", () => {
-  toggleDock(searchWrapper, searchDockBtn);
-  searchWrapper.classList.remove("floating");
-  searchWrapper.style.transform = "";
-});
-
-variablesDockBtn.addEventListener("click", () => {
-  toggleDock(variablesWrapper, variablesDockBtn);
-  variablesWrapper.classList.remove("floating");
-  variablesWrapper.style.transform = "";
-});
-
-searchSplitter.addEventListener("mousedown", (event) => {
-  event.preventDefault();
-  isResizingVertical = true;
-  activeResizePane = searchPane;
-});
-
-variablesSplitter.addEventListener("mousedown", (event) => {
-  event.preventDefault();
-  isResizingVertical = true;
-  activeResizePane = variablesPane;
-});
-
-document.addEventListener("mouseup", () => {
-  isResizingVertical = false;
-  activeResizePane = null;
-});
-
-document.addEventListener("mousemove", (event) => {
-  if (isResizingVertical && activeResizePane) {
-    const wrapper = activeResizePane === searchPane ? searchWrapper : variablesWrapper;
-    const wrapperRect = wrapper.getBoundingClientRect();
-    const dock = wrapper.dataset.dock || "right";
-    let newWidth;
-    if (dock === "left") {
-      newWidth = event.clientX - wrapperRect.left;
-    } else {
-      newWidth = wrapperRect.right - event.clientX;
-    }
-    const clamped = Math.max(220, Math.min(newWidth, 520));
-    activeResizePane.style.width = `${clamped}px`;
-  }
+togglePagesBtn.addEventListener("click", () => {
+  toggleDropdown(pagesDropdownContent);
 });
 
 runBtn.addEventListener("click", () => {
@@ -409,20 +330,22 @@ const createPage = (name) => {
   return page;
 };
 
-const startRenameTab = (page, tab, tabName) => {
+const startRenamePage = (page, pageRow) => {
+  const nameEl = pageRow.querySelector(".page-item-name");
   const input = document.createElement("input");
-  input.className = "tab-rename";
+  input.className = "page-item-rename";
   input.value = page.name;
-  tab.replaceChild(input, tabName);
+  input.type = "text";
+  pageRow.replaceChild(input, nameEl);
   input.focus();
   input.select();
 
   const finish = (apply) => {
     const value = input.value.trim();
-    if (apply && value) {
+    if (apply && value && value !== page.name) {
       page.name = value;
     }
-    renderTabs();
+    renderPages();
   };
 
   input.addEventListener("blur", () => finish(true));
@@ -438,28 +361,40 @@ const startRenameTab = (page, tab, tabName) => {
   });
 };
 
-const renderTabs = () => {
-  tabsContainer.innerHTML = "";
+const renderPages = () => {
+  pagesContent.innerHTML = "";
+
   pages.forEach(page => {
-    const tab = document.createElement("div");
-    tab.className = "tab";
+    const pageRow = document.createElement("div");
+    pageRow.className = "page-item";
     if (page.id === currentPageId) {
-      tab.classList.add("active");
+      pageRow.classList.add("active");
     }
 
-    const tabName = document.createElement("span");
-    tabName.className = "tab-name";
-    tabName.textContent = page.name;
-    tabName.addEventListener("dblclick", (event) => {
-      event.stopPropagation();
-      startRenameTab(page, tab, tabName);
+    const nameEl = document.createElement("div");
+    nameEl.className = "page-item-name";
+    nameEl.textContent = page.name;
+    nameEl.addEventListener("dblclick", (e) => {
+      e.stopPropagation();
+      startRenamePage(page, pageRow);
     });
-    tabName.onclick = () => switchToPage(page.id);
+    nameEl.style.cursor = "pointer";
+    nameEl.addEventListener("click", () => switchToPage(page.id));
 
-    const closeBtn = document.createElement("button");
-    closeBtn.className = "tab-close";
-    closeBtn.textContent = "×";
-    closeBtn.onclick = (e) => {
+    const actions = document.createElement("div");
+    actions.className = "page-item-actions";
+
+    const selectBtn = document.createElement("button");
+    selectBtn.className = "page-item-btn select";
+    selectBtn.textContent = "Select";
+    selectBtn.title = "Switch to this page";
+    selectBtn.onclick = () => switchToPage(page.id);
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.className = "page-item-btn delete";
+    deleteBtn.textContent = "Delete";
+    deleteBtn.title = "Delete this page";
+    deleteBtn.onclick = (e) => {
       e.stopPropagation();
       if (pages.length > 1) {
         const idx = pages.findIndex(p => p.id === page.id);
@@ -467,16 +402,17 @@ const renderTabs = () => {
         if (currentPageId === page.id) {
           switchToPage(pages[0].id);
         } else {
-          renderTabs();
+          renderPages();
         }
       }
     };
 
-    tab.appendChild(tabName);
-    if (pages.length > 1) {
-      tab.appendChild(closeBtn);
-    }
-    tabsContainer.appendChild(tab);
+    actions.appendChild(selectBtn);
+    actions.appendChild(deleteBtn);
+    
+    pageRow.appendChild(nameEl);
+    pageRow.appendChild(actions);
+    pagesContent.appendChild(pageRow);
   });
 };
 
@@ -572,7 +508,7 @@ const switchToPage = (pageId) => {
     previousLines = page.content.split("\n");
     latestResults = [...(page.results || [])];
     renderLines(previousLines);
-    renderTabs();
+    renderPages();
     renderVariables();
   }
 };
@@ -668,7 +604,7 @@ errorModal.addEventListener("click", (e) => {
   }
 });
 
-addTabBtn.addEventListener("click", () => {
+addPageBtn.addEventListener("click", () => {
   const page = createPage();
   switchToPage(page.id);
 });
@@ -679,12 +615,8 @@ const bootstrap = () => {
   initialPage.content = editor.value;
   previousLines = editor.value.split("\n");
   renderLines(previousLines);
-  renderTabs();
+  renderPages();
   renderVariables();
-  openPane(searchWrapper, searchPane);
-  openPane(variablesWrapper, variablesPane);
-  enableDragging(searchWrapper);
-  enableDragging(variablesWrapper);
   evaluateLines(previousLines, 0);
 };
 

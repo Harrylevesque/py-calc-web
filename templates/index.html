@@ -16,17 +16,38 @@
     </header>
 
     <div class="main-container" id="mainContainer">
-      <main class="editor-area" style="order: 2;">
+      <main class="editor-area">
         <div class="editor-menu">
           <div class="editor-menu-left">
             <button class="menu-btn" id="runBtn">▶ Run</button>
             <button class="menu-btn" id="clearBtn">Clear</button>
-            <button class="menu-btn" id="toggleSearch">Search</button>
-            <button class="menu-btn" id="toggleVars">Variables</button>
+            <div class="dropdown" id="searchDropdown">
+              <button class="menu-btn dropdown-toggle" id="toggleSearch">Search</button>
+              <div class="dropdown-content" id="searchDropdownContent">
+                <div class="dropdown-panel">
+                  <label for="functionSearch">Search functions or plain text</label>
+                  <input id="functionSearch" type="text" placeholder="Search functions or keywords" />
+                  <div id="searchResults" class="search-results"></div>
+                </div>
+              </div>
+            </div>
+            <div class="dropdown" id="variablesDropdown">
+              <button class="menu-btn dropdown-toggle" id="toggleVars">Variables</button>
+              <div class="dropdown-content" id="variablesDropdownContent">
+                <div class="dropdown-panel" id="variablesContent"></div>
+              </div>
+            </div>
+            <div class="dropdown" id="pagesDropdown">
+              <button class="menu-btn dropdown-toggle" id="togglePages">Pages</button>
+              <div class="dropdown-content" id="pagesDropdownContent">
+                <div class="dropdown-panel">
+                  <button class="panel-add-btn" id="addPageBtn">+ New Page</button>
+                  <div id="pagesContent"></div>
+                </div>
+              </div>
+            </div>
           </div>
           <div class="editor-menu-right">
-            <div class="tabs" id="tabs"></div>
-            <button class="tab-add-btn" id="addTabBtn">New Page</button>
             <span class="editor-info" id="editorInfo">Ready</span>
           </div>
         </div>
@@ -39,38 +60,6 @@ y = x * 2
 # Example: Page1.x"></textarea>
         </div>
       </main>
-
-      <div class="pane-wrapper" id="searchWrapper" data-dock="right" data-pane="search">
-        <div class="splitter vertical" id="searchSplitter" aria-hidden="true"></div>
-        <aside class="side-pane open" id="searchPane">
-          <div class="panel-header drag-handle">
-            <h3>Search</h3>
-            <div class="panel-actions">
-              <button class="panel-btn" id="searchDockBtn">Dock Left</button>
-              <button id="closeSearch" class="close-btn" aria-label="Close search">✕</button>
-            </div>
-          </div>
-          <div class="panel-content">
-            <label for="functionSearch">Search functions or plain text</label>
-            <input id="functionSearch" type="text" placeholder="Search functions or keywords" />
-            <div id="searchResults" class="search-results"></div>
-          </div>
-        </aside>
-      </div>
-
-      <div class="pane-wrapper" id="variablesWrapper" data-dock="right" data-pane="variables">
-        <div class="splitter vertical" id="variablesSplitter" aria-hidden="true"></div>
-        <aside class="side-pane open" id="variablesPane">
-          <div class="panel-header drag-handle">
-            <h3>Variables</h3>
-            <div class="panel-actions">
-              <button class="panel-btn" id="variablesDockBtn">Dock Left</button>
-              <button id="closeVariables" class="close-btn" aria-label="Close variables">✕</button>
-            </div>
-          </div>
-          <div class="panel-content" id="variablesContent"></div>
-        </aside>
-      </div>
     </div>
 
     <footer class="footer">
